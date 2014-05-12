@@ -3,11 +3,21 @@ require 'patm'
 require 'typedocs'
 
 module PowerAssert
+  include Typedocs::DSL
+  tdoc.typedef :@AST, 'Array'
+  tdoc.typedef :@Bool, 'TrueClass|FalseClass'
+
+  def self.current_context
+    Thread.current[:power_assert_context] ||= Context.new
+  end
+
+  class Context
+    def add(expr, value)
+    end
+  end
+
   class Extractor
     include Typedocs::DSL
-
-    tdoc.typedef :@AST, 'Array'
-    tdoc.typedef :@Bool, 'TrueClass|FalseClass'
 
     tdoc 'String -> Numeric -> @AST'
     def extract(path, line_no)
@@ -49,6 +59,23 @@ module PowerAssert
         end
       end
       nil
+    end
+  end
+  class Injector
+    include Typedocs::DSL
+
+    tdoc '@AST -> Tree'
+    def parse(ast)
+      Tree.new
+    end
+  end
+
+  class Tree
+    include Typedocs::DSL
+
+    tdoc 'String'
+    def to_source
+      ""
     end
   end
 end

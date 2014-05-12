@@ -16,3 +16,17 @@ describe PowerAssert::Extractor do
     ast[2][0][3].should == [:@int, "3", [3, 22]]
   end
 end
+
+describe PowerAssert::Injector do
+  it do
+    ast = Ripper.sexp("a + b == 10")
+    subject.parse(ast).to_source.should == %w(
+PowerAssert.current_context.clear
+(((a).tap{|_| PowerAssert.current_context.add('a', _) }
++
+(b).tap{|_| PowerAssert.current_context.add('b', _) }).tap{|_| PowerAssert.current_context.add('a + b', _) }
+==
+(10.tap{|_|PowerAssert.current_context.add('10', _) })).tap{|_| PowerAssert.current_context.add("a + b == 10", _) }
+    )
+  end
+end
